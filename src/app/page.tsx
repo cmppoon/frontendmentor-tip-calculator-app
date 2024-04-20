@@ -1,15 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DollarIcon from "./dollarIcon";
 import PersonIcon from "./personIcon";
 import Logo from "./logo";
 
 export default function Home() {
-  const [billAmount, setBillAmount] = useState<number | null>(null);
+  const [billAmount, setBillAmount] = useState<number>(0);
   const [tipPct, setTipPct] = useState<number>(0);
-  const [peopleNum, setPeopleNum] = useState<number | null>(null);
+  const [peopleNum, setPeopleNum] = useState<number>(0);
   const [activeButton, setActiveButton] = useState<number | null>(null);
+  const customTipInputRef = useRef<HTMLInputElement>(null);
 
   const btnList = [
     {
@@ -37,7 +38,6 @@ export default function Home() {
   const onBillAmontChange = (e: React.FormEvent<HTMLInputElement>) => {
     const amt = parseFloat(e.currentTarget.value);
     if (!isNaN(amt)) {
-      console.log(parseFloat(amt.toFixed(2)));
       setBillAmount(parseFloat(amt.toFixed(2)));
     } else {
       setBillAmount(0);
@@ -54,43 +54,36 @@ export default function Home() {
   };
 
   const calculateTipPerPerson = (): string => {
-    if (
-      !billAmount ||
-      billAmount < 0 ||
-      !peopleNum ||
-      peopleNum < 0 ||
-      tipPct < 0
-    ) {
+    if (billAmount <= 0 || peopleNum <= 0 || tipPct <= 0 || tipPct > 100) {
       return "0.00";
     }
     return ((billAmount * tipPct) / 100 / peopleNum).toFixed(2);
   };
 
   const calculateTotalPerPerson = (): string => {
-    if (
-      !billAmount ||
-      billAmount < 0 ||
-      !peopleNum ||
-      peopleNum < 0 ||
-      tipPct < 0
-    ) {
+    if (billAmount <= 0 || peopleNum <= 0 || tipPct <= 0 || tipPct > 100) {
       return "0.00";
     }
     return ((billAmount + (billAmount * tipPct) / 100) / peopleNum).toFixed(2);
   };
 
   const onCustomTipPctChange = (e: React.FormEvent<HTMLInputElement>) => {
-    setTipPct(parseInt(e.currentTarget.value));
+    const customTip = parseInt(e.currentTarget.value);
+    if (!isNaN(customTip)) {
+      setTipPct(customTip);
+    } else {
+      setTipPct(0);
+    }
   };
 
   const resetStates = () => {
-    setBillAmount(null);
+    setBillAmount(0);
     setTipPct(0);
-    setPeopleNum(null);
+    setPeopleNum(0);
     setActiveButton(null);
-    (document.getElementById("bill") as HTMLInputElement).value = "";
-    (document.getElementById("custom") as HTMLInputElement).value = "";
-    (document.getElementById("numpeople") as HTMLInputElement).value = "";
+    if (customTipInputRef.current) {
+      customTipInputRef.current.value = "";
+    }
   };
 
   type ErrorMsg = { billAmount: string; peopleNum: string; customTip: string };
@@ -135,7 +128,7 @@ export default function Home() {
               <label htmlFor="bill" className="text-sm text-dark-grayish-cyan">
                 Bill
               </label>
-              {errors && errors.billAmount && (
+              {errors.billAmount && (
                 <>
                   <span className="text-sm text-red-400">
                     {errors.billAmount}
@@ -175,9 +168,9 @@ export default function Home() {
                     } rounded-md py-2 text-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-strong-cyan`}
                     key={idx}
                     onClick={() => {
-                      (
-                        document.getElementById("custom") as HTMLInputElement
-                      ).value = "";
+                      if (customTipInputRef.current) {
+                        customTipInputRef.current.value = "";
+                      }
                       setTipPct(btn.value);
                       setActiveButton(idx);
                     }}
@@ -188,6 +181,7 @@ export default function Home() {
               })}
               <input
                 id="custom"
+                ref={customTipInputRef}
                 type="number"
                 step="any"
                 min={1}
@@ -210,7 +204,7 @@ export default function Home() {
               >
                 Number of People
               </label>
-              {errors && errors.peopleNum && (
+              {errors.peopleNum && (
                 <>
                   <span className="text-sm text-red-400">
                     {errors.peopleNum}
@@ -264,7 +258,7 @@ export default function Home() {
           <button
             className="w-full rounded-md bg-strong-cyan p-2 hover:bg-light-grayish-cyan disabled:bg-strong-cyan/30 disabled:text-grayish-cyan/40 sm:py-2.5"
             onClick={resetStates}
-            disabled={billAmount === 0 || peopleNum === 0 || tipPct === 0}
+            disabled={billAmount <= 0 || peopleNum <= 0 || tipPct <= 0 || tipPct > 100}
           >
             RESET
           </button>
