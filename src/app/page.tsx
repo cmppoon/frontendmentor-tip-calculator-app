@@ -117,7 +117,7 @@ export default function Home() {
   }, [billAmount, peopleNum, tipPct]);
 
   return (
-    <main className="mx-auto flex flex-col gap-10 max-sm:mt-12 sm:max-w-[50rem] sm:gap-16">
+    <main className="mx-auto flex flex-col gap-10 max-sm:mt-12 sm:max-w-[54rem] sm:gap-16">
       <div className="mx-auto">
         <Logo />
       </div>
@@ -231,34 +231,38 @@ export default function Home() {
           </div>
         </div>
         <div className="flex flex-col justify-between gap-y-4 rounded-lg bg-very-dark-cyan px-4 py-6 sm:p-8">
-          <div className="flex justify-between">
-            <div className="flex flex-col">
-              <span className="text-sm text-white sm:text-base">
-                Tip Amount
-              </span>
-              <span className="mt-1 text-xs text-grayish-cyan sm:text-sm">
-                / person
-              </span>
+          <div className="space-y-10">
+            <div className="flex justify-between">
+              <div className="flex flex-col">
+                <span className="text-sm text-white sm:text-base">
+                  Tip Amount
+                </span>
+                <span className="mt-1 text-xs text-grayish-cyan sm:text-sm">
+                  / person
+                </span>
+              </div>
+              <div className="truncate text-xl text-strong-cyan sm:text-4xl">
+                {`\$${calculateTipPerPerson()}`}
+              </div>
             </div>
-            <div className="truncate text-xl text-strong-cyan sm:text-4xl">
-              {`\$${calculateTipPerPerson()}`}
-            </div>
-          </div>
-          <div className="flex justify-between">
-            <div className="flex flex-col">
-              <span className="text-sm text-white sm:text-base">Total</span>
-              <span className="mt-1 text-xs text-grayish-cyan sm:text-sm">
-                / person
-              </span>
-            </div>
-            <div className="truncate text-xl text-strong-cyan sm:text-4xl">
-              {`\$${calculateTotalPerPerson()}`}
+            <div className="flex justify-between">
+              <div className="flex flex-col">
+                <span className="text-sm text-white sm:text-base">Total</span>
+                <span className="mt-1 text-xs text-grayish-cyan sm:text-sm">
+                  / person
+                </span>
+              </div>
+              <div className="truncate text-xl text-strong-cyan sm:text-4xl">
+                {`\$${calculateTotalPerPerson()}`}
+              </div>
             </div>
           </div>
           <button
             className="w-full rounded-md bg-strong-cyan p-2 hover:bg-light-grayish-cyan disabled:bg-strong-cyan/30 disabled:text-grayish-cyan/40 sm:py-2.5"
             onClick={resetStates}
-            disabled={billAmount <= 0 || peopleNum <= 0 || tipPct <= 0 || tipPct > 100}
+            disabled={
+              billAmount <= 0 || peopleNum <= 0 || tipPct <= 0 || tipPct > 100
+            }
           >
             RESET
           </button>
